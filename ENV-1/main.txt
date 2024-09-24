@@ -1,0 +1,13 @@
+Software:
+
+    System Software Overview:
+
+      System Version: macOS 12.7.6 (21H1320)
+      Kernel Version: Darwin 21.6.0
+      Boot Volume: Macintosh HD
+      Boot Mode: Normal
+      Computer Name: Mariam’s MacBook Air (2)
+      User Name: Mariam Avagyan (mavagyan)
+      Secure Virtual Memory: Enabled
+      System Integrity Protection: Enabled
+      Time since boot: 1 day 7:21
