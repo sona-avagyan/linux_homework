@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fcntl.h>  
 #include <unistd.h>
-#include <string> 
+#include <сstring> 
 #include <errno.h>
 
 int main(int argc, char* argv[]) {
