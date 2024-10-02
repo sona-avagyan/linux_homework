@@ -36,7 +36,7 @@ int main (int argc, char**  argv){
   }
   
   if (bytes_read == -1) {
-    std::cerr << argv[1] <<strerror(errno);
+    std::cerr << argv[1] << strerror(errno);
     close(fd1);
     close(fd2);
     return 1;
