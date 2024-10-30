@@ -28,7 +28,7 @@ void do_command(char** argv) {
     }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv[]) {
     if (argc < 2) {
         std::cerr << argv[0] << std::endl;
         return 1;
