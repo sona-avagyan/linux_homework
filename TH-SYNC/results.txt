@@ -1,0 +1,13 @@
+the best result for file_with_mutex.cpp was the first one 
+Final value (mutex): 500000
+Execution time: 0.0553105 seconds
+
+the best result for file_with_spinlock.cpp was 
+Final value: 500000
+Execution time: 0.183708 seconds
+
+the best result for file_with_semaphore.cpp was
+Final value: 500000
+Execution time: 0.174306 seconds
+
+
