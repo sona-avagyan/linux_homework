@@ -8,13 +8,12 @@
 #include <unistd.h>
 #include <semaphore.h>
 #include <stdexcept>
-#include <cstring>
 
 class shared_array {
 private:
 	const char* name_;
     	size_t size_;
-    	int* data_;
+    	int* arr_;
     	int shm_fd_;
     	sem_t* sem_;
 
@@ -34,8 +33,8 @@ public:
 		return;
         }
 
-        data_ = static_cast<int*>(mmap(nullptr, size_ * sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd_, 0));
-        if (data_ == MAP_FAILED) {
+        arr_ = static_cast<int*>(mmap(nullptr, size_ * sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd_, 0));
+        if (arr_ == MAP_FAILED) {
             	close(shm_fd_);
         	return;
 	}
@@ -43,22 +42,22 @@ public:
         std::string sem_name = std::string("/") + name_ + "_sem";
         sem_ = sem_open(sem_name.c_str(), O_CREAT, 0666, 1);
         if (sem_ == SEM_FAILED) {
-            	munmap(data_, size_ * sizeof(int));
+            	munmap(arr_, size_ * sizeof(int));
             	close(shm_fd_);
 		return;
         }
     }
 
 	~shared_array() {
-        	munmap(data_, size_ * sizeof(int));
+        	munmap(arr_, size_ * sizeof(int));
         	close(shm_fd_);
     	}
 
 	int& operator[](size_t index) {
         	if (index >= size_) {
-        		return data_[0];
+        		return arr_[0];
 		}
-        	return data_[index];
+        	return arr_[index];
     	}	
 
     	void lock() { 
