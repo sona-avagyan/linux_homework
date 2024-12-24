@@ -1,3 +1,4 @@
+// я так и не разобралась честно говоря как это правильно написать, и жта программа не разаботала нормально
 #ifndef PARALLEL_SCHEDULER_HPP
 #define PARALLEL_SCHEDULER_HPP
 
