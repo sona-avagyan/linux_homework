@@ -1,3 +1,4 @@
+// честно говоря не получилось нормально реализовать момент с exit и list
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
