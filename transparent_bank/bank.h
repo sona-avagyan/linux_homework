@@ -1,5 +1,5 @@
 #pragma once
-#include <vector> 
+//#include <vector> 
 
 class Bill {
 public:
@@ -13,8 +13,8 @@ public:
 
 class Bank {
 private:
-  
-  std::vector <Bill> bills;
+   int size;
+   Bill bills[];
 
   
 public:
