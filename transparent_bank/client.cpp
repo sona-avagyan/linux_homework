@@ -10,6 +10,24 @@
 #include <sstream>
 
 int main(int argc, char** argv) {
+  struct sockaddr_in server_address;
+  int client_socket = socket(AF_INET, SOCK_STREAM, 0);
+  if (client_socket == -1) {
+        perror("socket creation error");
+        exit(errno);
+  }
+  server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+  server_address.sin_family = AF_INET;
+  server_address.sin_port = htons(8888);
+  int connected = connect(client_socket, (struct sockaddr*) &server_address, sizeof(server_address));
+
+  if(connected == -1){
+    perror("connection failed");
+    exit(errno);
+  }
+
+
+
 
   int shm_fd = shm_open("/TransparentBank", O_RDWR, 0666);
   struct stat sb;
@@ -39,80 +57,159 @@ int main(int argc, char** argv) {
                
   std::cout << list;
   while(true) {
-     std::string command;
-     std::getline(std::cin, command);
-     if (command == "exit") {
-        break;
-     }
+    std::string line;
+    std::getline(std::cin, line);
      
-    if (command.find("pcurb" == 0)) {
-       std::istringstream iss(command);
-       std::string cmd;
+    std::istringstream iss(line);
+    std::string cmd;
+    iss >> cmd;
+    
+    if (cmd == "exit") {
+	std::cout << "Disconnect" << std::endl;
+
+    } else if (cmd == "pcurb") {
        int id;
+       iss >> id;
 
-       iss >> cmd >> id;
-
-       if (iss) {
-        std::cout << "Current balance:\n " << bank->print_cur_balance(id);
+       if (!iss.fail()) {
+         bank->print_cur_balance(id);
        } else {
-        std::cerr << "Ошибка: не удалось прочитать ID\n";
+         std::cerr << "Ошибка: не удалось прочитать ID\n";
        }
-       continue;
-    } 
 
-    if (command.find("pminb" == 0)) {
-       std::istringstream iss(command);
-       std::string cmd;
+    } else if (cmd == "pminb") {
        int id;
+       iss >> id;  
 
-       iss >> cmd >> id;  
-
-       if (iss) {
-        std::cout << "Minimal balance:\n " << bank->print_min_balance(id);
+       if (!iss.fail()) {
+         bank->print_min_balance(id);
        } else {
-        std::cerr << "Ошибка: не удалось прочитать ID\n";
+         std::cerr << "Ошибка: не удалось прочитать ID\n";
        }
-    }
 
-    if (command.find("pmaxb" == 0)) {
-       std::istringstream iss(command);
-       std::string cmd;
+    } else if (cmd == "pmaxb") {
        int id;
+       iss >> id;  
 
-       iss >> cmd >> id;  
-
-       if (iss) {
-        std::cout << "Maximal balance:\n " << bank->print_max_balance(id);
+       if (!iss.fail()) {
+         bank->print_max_balance(id);
        } else {
-        std::cerr << "Ошибка: не удалось прочитать ID\n";
+         std::cerr << "Ошибка: не удалось прочитать ID\n";
        }
     }
-  
-    if (command.find("froze" == 0)) {
-       std::istringstream iss(command);
-       std::string cmd;
-       int id;
+    
+   // if (command.find("froze")) {
+   //    std::istringstream iss(command);
+   //    std::string cmd;
+   //    int id;
 
-       iss >> cmd >> id;  
+   //    iss >> cmd >> id;  
 
-       if (iss) {
-          bank->froze(id);
-          std::cout << "Balance is frozen:\n ";
-       } else {
-        std::cerr << "Ошибка: не удалось прочитать ID\n";
-       }
-    }
+   //    if (iss) {
+   //       bank->froze(id);
+   //       std::cout << "Balance is frozen:\n ";
+   //    } else {
+   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
+   //    }
+   // }
 
+   // if (command.find("defroze")) {
+   //    std::istringstream iss(command);
+   //    std::string cmd;
+   //    int id;
 
+   //    iss >> cmd >> id;  
 
+   //    if (iss) {
+   //       bank->defroze(id);
+   //       std::cout << "Balance is defrozen:\n ";
+   //    } else {
+   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
+   //    }
+   // }
 
+   // if (command.find("tfromto")) {
+   //    std::istringstream iss(command);
+   //    std::string cmd;
+   //    int id1, id2;
+   //    int sum;
 
+   //    iss >> cmd >> id1 >> id2 >> sum;  
 
+   //    if (iss) {
+   //       bank->transfer(id1, id2, sum);
+   //       std::cout << sum << "Transfered from" << id1 << "to" << id2;
+   //    } else {
+   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
+   //    }
+   // }
+
+   // if (command.find("addall")) {
+   //    std::istringstream iss(command);
+   //    std::string cmd;
+   //    int sum;
+
+   //    iss >> cmd >> sum;
+
+   //    if (iss) {
+   //       bank->enroll_to_all(sum);
+   //       std::cout << sum << "Transfered to all accounts";
+   //    } else {
+   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
+   //    }
+   // }
+
+   // if (command.find("suball")) {
+   //    std::istringstream iss(command);
+   //    std::string cmd;
+   //    int sum;
+
+   //    iss >> cmd >> sum;
+
+   //    if (iss) {
+   //       bank->debit_from_all(sum);
+   //       std::cout << sum << "Transfered from all accounts";
+   //    } else {
+   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
+   //    }
+   // }
+
+   // if (command.find("setminb")) {
+   //    std::istringstream iss(command);
+   //    std::string cmd;
+   //    int id;
+   //    int sum;
+
+   //    iss >> cmd >> id >> sum;
+
+   //    if (iss) {
+   //       bank->set_min_balance(id, sum);
+   //       std::cout << "Your minimal balance set to " << sum;
+   //    } else {
+   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
+   //    }
+   // }
+
+   // if (command.find("setmaxb")) {
+   //    std::istringstream iss(command);
+   //    std::string cmd;
+   //    int id;
+   //    int sum;
+
+   //    iss >> cmd >> id >> sum;
+
+   //    if (iss) {
+   //       bank->set_max_balance(id, sum);
+   //       std::cout << "Your maximal balance set to " << sum;
+   //    } else {
+   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
+   //    }
+   // }
 }
 
 
   
-
+  close(client_socket);
   munmap(shm_ptr, shm_size);
   close(shm_fd);
 	  

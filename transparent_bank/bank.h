@@ -13,15 +13,16 @@ public:
 
 class Bank {
 private:
+   pthread_mutex_t mutex;
    int size;
    Bill bills[];
 
   
 public:
   Bank(int n);
-  int print_cur_balance(int id);
-  int print_min_balance(int id);
-  int print_max_balance(int id);
+  void print_cur_balance(int id);
+  void print_min_balance(int id);
+  void print_max_balance(int id);
 
 
   void froze(int id);
