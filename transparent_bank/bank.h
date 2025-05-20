@@ -1,5 +1,7 @@
 #pragma once
 //#include <vector> 
+#include <pthread.h>
+#include <climits> 
 
 class Bill {
 public:
@@ -8,14 +10,14 @@ public:
   int max_pos_balance;
   bool is_frozen;
   int ID;
+  pthread_mutex_t mutex;
 };
 
 
 class Bank {
 private:
-   pthread_mutex_t mutex;
    int size;
-   Bill bills[];
+   Bill* bills;
 
   
 public:

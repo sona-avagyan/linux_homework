@@ -8,6 +8,10 @@
 #include "bank.h"
 #include <string>
 #include <sstream>
+#include <cstring>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
 
 int main(int argc, char** argv) {
   struct sockaddr_in server_address;
