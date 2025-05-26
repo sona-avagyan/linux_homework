@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
   }
 
   int shm_size = sb.st_size;
-  std::cout << shm_size << std::endl; 
+  //std::cout << shm_size << std::endl; 
   void* shm_ptr = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
   Bank* bank = (Bank*)shm_ptr;
   // bank->print();
@@ -71,6 +71,8 @@ int main(int argc, char** argv) {
     if (cmd == "exit") {
 	std::cout << "Disconnect" << std::endl;
 
+    } else if (cmd == "help") {
+    	std::cout << list;
     } else if (cmd == "pcurb") {
        int id;
        iss >> id;
@@ -100,115 +102,82 @@ int main(int argc, char** argv) {
        } else {
          std::cerr << "Ошибка: не удалось прочитать ID\n";
        }
+    } else if (cmd == "froze") {
+       int id;
+       iss >> id;  
+
+       if (iss) {
+          bank->froze(id);
+         // std::cout << "Balance is frozen:\n ";
+       } else {
+        std::cerr << "Ошибка: не удалось прочитать ID\n";
+       }
+    } else if (cmd == "defroze") {
+       int id;
+       iss >> id;  
+
+       if (iss) {
+         bank->defroze(id);
+         //std::cout << "Balance is defrozen:\n ";
+       } else {
+         std::cerr << "Ошибка: не удалось прочитать ID\n";
+       }
+   } else if (cmd == "tfromto") {
+       int id1, id2;
+       int sum;
+       iss >> id1 >> id2 >> sum;  
+
+       if (iss) {
+         bank->transfer(id1, id2, sum);
+         //std::cout << sum << " dram transfered from" << id1 << "to" << id2;
+       } else {
+        std::cerr << "Ошибка: не удалось прочитать ID\n";
+       }
+    } else if (cmd == "addall") {
+       int sum;
+       iss >> sum;
+
+       if (iss) {
+         bank->enroll_to_all(sum);
+         //std::cout << sum << "dram transfered to all accounts";
+       } else {
+        std::cerr << "Ошибка: не удалось прочитать ID\n";
+       }
+    } else if (cmd == "suball") {
+       int sum;
+       iss >> sum;
+
+       if (iss) {
+         bank->debit_from_all(sum);
+         //std::cout << sum << "dram transfered from all accounts";
+       } else {
+        std::cerr << "Ошибка: не удалось прочитать ID\n";
+       }
+    } else if (cmd == "setminb") {
+       int id;
+       int sum;
+
+       iss >> id >> sum;
+
+       if (iss) {
+          bank->set_min_balance(id, sum);
+          //std::cout << "Your minimal balance set to " << sum;
+       } else {
+        std::cerr << "Ошибка: не удалось прочитать ID\n";
+       }
+    } else if (cmd == "setmaxb") {
+       int id;
+       int sum;
+
+       iss >> id >> sum;
+
+       if (iss) {
+          bank->set_max_balance(id, sum);
+          //std::cout << "Your maximal balance set to " << sum;
+       } else {
+        std::cerr << "Ошибка: не удалось прочитать ID\n";
+       }
     }
-    
-   // if (command.find("froze")) {
-   //    std::istringstream iss(command);
-   //    std::string cmd;
-   //    int id;
-
-   //    iss >> cmd >> id;  
-
-   //    if (iss) {
-   //       bank->froze(id);
-   //       std::cout << "Balance is frozen:\n ";
-   //    } else {
-   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
-   //    }
-   // }
-
-   // if (command.find("defroze")) {
-   //    std::istringstream iss(command);
-   //    std::string cmd;
-   //    int id;
-
-   //    iss >> cmd >> id;  
-
-   //    if (iss) {
-   //       bank->defroze(id);
-   //       std::cout << "Balance is defrozen:\n ";
-   //    } else {
-   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
-   //    }
-   // }
-
-   // if (command.find("tfromto")) {
-   //    std::istringstream iss(command);
-   //    std::string cmd;
-   //    int id1, id2;
-   //    int sum;
-
-   //    iss >> cmd >> id1 >> id2 >> sum;  
-
-   //    if (iss) {
-   //       bank->transfer(id1, id2, sum);
-   //       std::cout << sum << "Transfered from" << id1 << "to" << id2;
-   //    } else {
-   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
-   //    }
-   // }
-
-   // if (command.find("addall")) {
-   //    std::istringstream iss(command);
-   //    std::string cmd;
-   //    int sum;
-
-   //    iss >> cmd >> sum;
-
-   //    if (iss) {
-   //       bank->enroll_to_all(sum);
-   //       std::cout << sum << "Transfered to all accounts";
-   //    } else {
-   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
-   //    }
-   // }
-
-   // if (command.find("suball")) {
-   //    std::istringstream iss(command);
-   //    std::string cmd;
-   //    int sum;
-
-   //    iss >> cmd >> sum;
-
-   //    if (iss) {
-   //       bank->debit_from_all(sum);
-   //       std::cout << sum << "Transfered from all accounts";
-   //    } else {
-   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
-   //    }
-   // }
-
-   // if (command.find("setminb")) {
-   //    std::istringstream iss(command);
-   //    std::string cmd;
-   //    int id;
-   //    int sum;
-
-   //    iss >> cmd >> id >> sum;
-
-   //    if (iss) {
-   //       bank->set_min_balance(id, sum);
-   //       std::cout << "Your minimal balance set to " << sum;
-   //    } else {
-   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
-   //    }
-   // }
-
-   // if (command.find("setmaxb")) {
-   //    std::istringstream iss(command);
-   //    std::string cmd;
-   //    int id;
-   //    int sum;
-
-   //    iss >> cmd >> id >> sum;
-
-   //    if (iss) {
-   //       bank->set_max_balance(id, sum);
-   //       std::cout << "Your maximal balance set to " << sum;
-   //    } else {
-   //     std::cerr << "Ошибка: не удалось прочитать ID\n";
-   //    }
-   // }
 }
 
 

@@ -17,7 +17,7 @@ public:
 class Bank {
 private:
    int size;
-   Bill* bills;
+   Bill bills[];
 
   
 public:

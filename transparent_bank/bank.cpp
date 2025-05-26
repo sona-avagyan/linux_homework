@@ -5,7 +5,7 @@
 
 Bank::Bank(int n) {
     size = n;
-    bills = new Bill[size];
+    //bills = new Bill[size];
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
@@ -25,7 +25,7 @@ Bank::~Bank() {
     for (int i = 0; i < size; ++i) {
         pthread_mutex_destroy(&bills[i].mutex);
     }
-    delete[] bills;
+    //delete[] bills;
 }
 
 void Bank::print() {
@@ -81,7 +81,7 @@ void Bank::froze (int id) {
        pthread_mutex_lock(&bills[id].mutex);
        bills[id].is_frozen = true;
        pthread_mutex_unlock(&bills[id].mutex);
-       std::cout << "id " << id << "have frozen" << std::endl;
+       std::cout << "id " << id << " have frozen" << std::endl;
     }
 }
 
@@ -90,7 +90,7 @@ void Bank::defroze (int id) {
        pthread_mutex_lock(&bills[id].mutex);
        bills[id].is_frozen = false;
        pthread_mutex_unlock(&bills[id].mutex);
-       std::cout << "id " << id << "have defrozen" << std::endl;
+       std::cout << "id " << id << " have defrozen" << std::endl;
     }
 }
 
@@ -125,12 +125,12 @@ void Bank::enroll_to_all (int sum) {
              if (bills[id].cur_balance < bills[id].max_pos_balance && bills[id].cur_balance > bills[id].min_pos_balance) {
                 if (!bills[id].is_frozen) {
                    bills[id].cur_balance +=sum;
-                   std::cout << sum << " dram transfered to all accounts." << std::endl;
                 }    
              }
            }
            pthread_mutex_unlock(&bills[id].mutex);
-        }
+        } 
+        std::cout << sum << " dram transfered to all accounts." << std::endl;
      }
 }
 
@@ -142,12 +142,12 @@ void Bank::debit_from_all (int sum) {
              if (bills[id].cur_balance < bills[id].max_pos_balance && bills[id].cur_balance > bills[id].min_pos_balance) {
                 if (!bills[id].is_frozen) {
                    bills[id].cur_balance -=sum;
-                   std::cout << sum << " dram transfered from all accounts."<< std::endl;
                 }
              }
           }
           pthread_mutex_unlock(&bills[id].mutex);
        }
+       std::cout << sum << " dram transfered from all accounts."<< std::endl;
     }
 }
 
