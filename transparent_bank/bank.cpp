@@ -158,7 +158,7 @@ void Bank::set_min_balance (int id, int sum) {
          pthread_mutex_lock(&bills[id].mutex);
          bills[id].min_pos_balance = sum;
          pthread_mutex_unlock(&bills[id].mutex);
-         std::cout << "Minimal possible balance of id" << id << "set to" << bills[id].min_pos_balance << " dram." << std::endl;
+         std::cout << "Minimal possible balance of id" << id << " set to " << bills[id].min_pos_balance << " dram." << std::endl;
       }
    }
 }
@@ -169,7 +169,7 @@ void Bank::set_max_balance (int id, int sum) {
           pthread_mutex_lock(&bills[id].mutex);
           bills[id].max_pos_balance = sum;
           pthread_mutex_unlock(&bills[id].mutex);
-          std::cout << "Maximal possible balance of id" << id << "set to" << bills[id].max_pos_balance << " dram." << std::endl;
+          std::cout << "Maximal possible balance of id" << id << " set to " << bills[id].max_pos_balance << " dram." << std::endl;
        }
     }
 }

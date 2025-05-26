@@ -1,77 +1,113 @@
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <vector>
+#include <string>
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <cstring>
+#include "colorprint.hpp"
 
+constexpr int PORT = 8888;
+
+std::atomic<int> request_count{0};
+std::mutex count_mutex;
+std::condition_variable count_cond;
+bool shutdown_requested = false;
+
+// Поток для вывода каждых 5 запросов
+void monitor_requests() {
+    int last_reported = 0;
+    std::unique_lock<std::mutex> lock(count_mutex);
+    while (!shutdown_requested) {
+        count_cond.wait(lock, [&]() {
+            return request_count - last_reported >= 5 || shutdown_requested;
+        });
+
+        if (shutdown_requested) break;
+
+        last_reported = request_count.load();
+        Painter p(std::cout, {"REQUESTS"}, {});
+        p << "=== REQUESTS processed: " + std::to_string(last_reported) + " ===\n";
+    }
+}
+
+// Поток для клиента
+void handle_client(int client_socket) {
+    char buffer[1001];
+    ssize_t bytes_received = recv(client_socket, buffer, 1000, 0);
+    if (bytes_received <= 0) {
+        close(client_socket);
+        return;
+    }
+
+    buffer[bytes_received] = '\0';
+    std::string msg(buffer);
+
+    Painter p(std::cout, {"shutdown", "ADD", "SUB", "MUL", "DIV"}, {"ERROR", "FAIL"});
+    p << "[Client] Message received: " + msg + "\n";
+
+    if (msg.find("shutdown") != std::string::npos) {
+        shutdown_requested = true;
+        count_cond.notify_all();
+        send(client_socket, "Server shutting down.\n", 23, 0);
+    } else {
+        // Имитация вычисления
+        std::string reply = "Result: OK\n";
+        send(client_socket, reply.c_str(), reply.size(), 0);
+        request_count++;
+        count_cond.notify_all();
+    }
+
+    close(client_socket);
+}
 
 int main() {
-  // create a socket  
-  int server_socket = socket(AF_INET, SOCK_STREAM, 0);
-  if (server_socket == -1) {
-      perror("socket creation error");
-      exit(errno);
-  }
+    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket == -1) {
+        perror("socket error");
+        return 1;
+    }
 
-  // create an endpoint
-  
-  // socket address
-  struct sockaddr_in server_address;
-  // internet protocol = AF_INET
-  server_address.sin_family = AF_INET;
-  // accept or any address (bind the socket to all available interfaces)
-  server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-  // port
-  server_address.sin_port = htons(8888);
+    sockaddr_in server_addr{};
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
 
-  // Bind server_socket to server_address
-  if (bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
-      perror("bind failed");
-      exit(errno);
-  }
+    if (bind(server_socket, (sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        perror("bind error");
+        return 1;
+    }
 
-  // Listen for incoming connections
-  if (listen(server_socket, 10) < 0) {
-    perror("listen failed");
-    exit(errno);
-  }
-  std::cout << "Waiting for connection\n";
+    if (listen(server_socket, 10) < 0) {
+        perror("listen error");
+        return 1;
+    }
 
-  while(true) {
-      int client_socket;
-      struct sockaddr_in client_address;
-      unsigned int client_addr_len = sizeof(client_address);
+    std::cout << "Server is running on port " << PORT << "\n";
 
-      // Accept incoming connection
-      if ((client_socket = accept(server_socket, (struct sockaddr*) &client_address, &client_addr_len)) < 0) {
-          perror("accept failed");
-          exit(errno);
-      }
+    std::thread stats_thread(monitor_requests);
 
-      std::cout << "Connected client with address: " << inet_ntoa(client_address.sin_addr) << "\n";
+    while (!shutdown_requested) {
+        sockaddr_in client_addr;
+        socklen_t client_len = sizeof(client_addr);
+        int client_socket = accept(server_socket, (sockaddr*)&client_addr, &client_len);
+        if (client_socket < 0) {
+            if (shutdown_requested) break;
+            perror("accept error");
+            continue;
+        }
 
-      char buffer[1001];
-      // Receive message from client
-      int rs = recv(client_socket, buffer, 1000, 0);
-      if (rs == -1) {
-        perror("client socket connection error");
-        close(client_socket);
-        continue;
-      }
+        std::thread client_thread(handle_client, client_socket);
+        client_thread.detach();
+    }
 
-      if (rs > 0) {
-        std::cout << "Got message:\n";
-        buffer[rs] = '\0';
-        std::cout << buffer << "\n";
-      }
-
-      close(client_socket);
-  }
-  
-  // close
-  close(server_socket);
-  return 0;
+    stats_thread.join();
+    close(server_socket);
+    std::cout << "Server shut down gracefully.\n";
+    return 0;
 }
+

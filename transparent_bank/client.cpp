@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
        } else {
         std::cerr << "Ошибка: не удалось прочитать ID\n";
        }
-    } else if (cmd == "setminb") {
+    } else if (cmd == "sminb") {
        int id;
        int sum;
 
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
        } else {
         std::cerr << "Ошибка: не удалось прочитать ID\n";
        }
-    } else if (cmd == "setmaxb") {
+    } else if (cmd == "smaxb") {
        int id;
        int sum;
 
